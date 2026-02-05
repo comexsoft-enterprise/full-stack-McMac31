@@ -232,3 +232,52 @@
     gap: 0.5rem;
   }
 }
+
+
+/* =================DRAG & DROP Y LOADING ================= */
+.drag-toggle-btn {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 100;
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+
+.drag-toggle-btn:hover {
+  background-color: #444;
+}
+.drag-toggle-btn.active {
+  background-color: #4CAF50;
+  border-color: #4CAF50;
+}
+
+.panel.drag-mode-lib {
+  border-color: #4CAF50; 
+}
+
+.panel.drag-mode-dex {
+  border-color: #ffcb05; 
+}
+
+
+.draggable-item {
+  cursor: grab;
+}
+
+.draggable-item:active {
+  cursor: grabbing;
+}
+
+.loading-text {
+  text-align: center;
+  opacity: 0.5;
+  padding: 10px;
+  font-style: italic;
+}
