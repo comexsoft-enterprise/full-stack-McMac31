@@ -17,7 +17,7 @@ function App() {
         const data = await pokemonService.getAll();
         setLibrary(data);
       } catch (error) {
-        console.error("Failed to load app", error);
+        console.error("Error cargando pokemons:", error);
       }
     };
     loadPokemons();
@@ -26,15 +26,12 @@ function App() {
   // Función para mover un pokemon de la biblioteca a la pokedex
   const addToPokedex = () => {
     if (selectedId === null) return;
-    
     const pokemon = library.find(p => p.id === selectedId);
     if (!pokemon) return;
-
     // Añadir a Pokedex
     setPokedex([...pokedex, pokemon]);
     // Remover de Library
     setLibrary(library.filter(p => p.id !== selectedId));
-    
     setSelectedId(null);
   };
 
@@ -48,31 +45,58 @@ function App() {
     //Remover de Pokedex
     setPokedex(pokedex.filter(p => p.id !== pokemon.id));
   };
-
-  //Vista temp 
+//Diseño de la interfaz con tres secciones: biblioteca, controles y pokedex
   return (
-    <div>
-      <h1>Vista prueba</h1>
-      <h3>Library ({library.length})</h3>
-      {library.map(p => (
-        <div key={p.id} onClick={() => setSelectedId(p.id)}style={{ cursor: 'pointer' }}>
-          {selectedId === p.id ? ' [ SELECCIONADO ] ' : '[ ] '} 
-          {p.name}
+    <div className="app-container">
+      <section className="panel">
+        <header className="panel-header">
+          <h2>Lista Pokémon</h2>
+          <small>{library.length} disponibles</small>
+        </header>
+        
+        <div className="list-container">
+          {library.map((p) => (
+            <div key={p.id} className={`list-item ${selectedId === p.id ? 'selected' : ''}`}onClick={() => setSelectedId(p.id)}>
+              <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`} alt={p.name} className="sprite-small"/>
+              <span className="pokemon-id">#{p.id.toString().padStart(3, '0')}</span>
+              <span className="pokemon-name">{p.name}</span>
+            </div>
+          ))}
         </div>
-      ))}
+      </section>
+      <section className="controls">
+        <button className="transfer-btn"onClick={addToPokedex} disabled={selectedId === null}title="Capturar Pokémon">
+          ➔
+        </button>
+      </section>
+      <section className="panel pokedex-panel">
+        <header className="panel-header">
+          <h2>Mi Pokédex</h2>
+          <small>{pokedex.length} capturados</small>
+        </header>
 
-      <br/>
-      <button onClick={addToPokedex} disabled={selectedId === null}>Mover a pokedex</button>
-      <br /><br/>
-      <h3>Pokedex ({pokedex.length})</h3>
-      {pokedex.map(p => (
-        <div key={p.id}>
-          {p.name} 
-          <button onClick={() => returnToLibrary(p)} style={{ marginLeft: '10px' }}>Borrar</button>
+        <div className="grid-container">
+          {pokedex.map((p) => (
+            <div key={p.id} className="card">
+              <div 
+                className="close-btn" 
+                onClick={() => returnToLibrary(p)}
+                title="Liberar Pokémon"
+              >✕</div>
+              
+              <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`} alt={p.name} />
+              <span className="pokemon-name">{p.name}</span>
+            </div>
+          ))}
+          {pokedex.length === 0 && (
+            <div className="empty-state">
+              <p>La Pokédex está vacía</p>
+              <small>Selecciona un Pokémon de la izquierda para moverlo aquí</small>
+            </div>
+          )}
         </div>
-      ))}
+      </section>
     </div>
   );
 }
-
 export default App;
