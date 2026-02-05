@@ -1,53 +1,78 @@
-import { useEffect, useState } from 'react'
-import './App.css'
-
-//He definido la interfaz para los objetos Pokemon
-// Ya que la API devuelve varios datos, pero solo usaremos estos tres asegurando que el ID es un número
-interface Pokemon { 
-  id: number;
-  name: string;
-  url: string;
- 
-}
+import { useEffect, useState } from 'react';
+import './App.css';
+import { pokemonService } from './services/pokemon_Service';
+import { Pokemon } from './types/pokemon';
 
 function App() {
-  //Estados para manejar los pokemons, la librería y el pokedex
-  const [library, setLibrary] = useState<Pokemon[]>([])
-  const [pokedex, setPokedex] = useState<Pokemon[]>([])
-  const[selectedId, setSelectedId]= useState<number | null>(null)
+  //Estados para la biblioteca, la pokedex y el pokemon seleccionado
+  const [library, setLibrary] = useState<Pokemon[]>([]);
+  const [pokedex, setPokedex] = useState<Pokemon[]>([]);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
-// useEffect para cargar los pokemons al montar el componente
-  useEffect(()=>{
-    const fetchPokemons = async () => {
+  // Carga inicial de pokemons usando el servicio
+  useEffect(() => {
+    // Función asíncrona para cargar pokemons
+    const loadPokemons = async () => {
       try {
-        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=20');
-        const data = await response.json();
-        const cleanPokemons: Pokemon[] = data.results.map((p: any) => {
-        const parts = p.url.split('/'); // Divide la URL para extraer el ID
-        const id = parseInt(parts[parts.length - 2]); // Extrae el ID de la URL
-        return {
-          name: p.name,
-          url: p.url,
-          id: id
-        };
-      });
-        setLibrary(cleanPokemons);
+        const data = await pokemonService.getAll();
+        setLibrary(data);
       } catch (error) {
-        console.error('Error cargando pokemons:', error);
+        console.error("Failed to load app", error);
       }
     };
-    fetchPokemons();
+    loadPokemons();
   }, []);
-  //Prueba de renderizado
+  
+  // Función para mover un pokemon de la biblioteca a la pokedex
+  const addToPokedex = () => {
+    if (selectedId === null) return;
+    
+    const pokemon = library.find(p => p.id === selectedId);
+    if (!pokemon) return;
+
+    // Añadir a Pokedex
+    setPokedex([...pokedex, pokemon]);
+    // Remover de Library
+    setLibrary(library.filter(p => p.id !== selectedId));
+    
+    setSelectedId(null);
+  };
+
+  const returnToLibrary = (pokemon: Pokemon) => {
+    // Formamos una lista mixta (Library + Pokemon a devolver)
+    const mixedList = [...library, pokemon];
+    // Ordenamos por ID usando la función del servicio
+    const sortedList = pokemonService.sortById(mixedList);
+    
+    setLibrary(sortedList);
+    //Remover de Pokedex
+    setPokedex(pokedex.filter(p => p.id !== pokemon.id));
+  };
+
+  //Vista temp 
   return (
-    <>
-      {
-      <div>
-      <h1>Cargando {library.length} Pokemons... </h1>
-      </div>
-      }
-    </>
-  )
+    <div>
+      <h1>Vista prueba</h1>
+      <h3>Library ({library.length})</h3>
+      {library.map(p => (
+        <div key={p.id} onClick={() => setSelectedId(p.id)}style={{ cursor: 'pointer' }}>
+          {selectedId === p.id ? ' [ SELECCIONADO ] ' : '[ ] '} 
+          {p.name}
+        </div>
+      ))}
+
+      <br/>
+      <button onClick={addToPokedex} disabled={selectedId === null}>Mover a pokedex</button>
+      <br /><br/>
+      <h3>Pokedex ({pokedex.length})</h3>
+      {pokedex.map(p => (
+        <div key={p.id}>
+          {p.name} 
+          <button onClick={() => returnToLibrary(p)} style={{ marginLeft: '10px' }}>Borrar</button>
+        </div>
+      ))}
+    </div>
+  );
 }
 
-export default App
+export default App;
