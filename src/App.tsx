@@ -53,11 +53,10 @@ function App() {
           <h2>Lista Pokémon</h2>
           <small>{library.length} disponibles</small>
         </header>
-        
         <div className="list-container">
           {library.map((p) => (
             <div key={p.id} className={`list-item ${selectedId === p.id ? 'selected' : ''}`}onClick={() => setSelectedId(p.id)}>
-              <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`} alt={p.name} className="sprite-small"/>
+              <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`} alt={p.name} className="sprite-small"/> {/*Sprites de los pokemones por id*/}
               <span className="pokemon-id">#{p.id.toString().padStart(3, '0')}</span>
               <span className="pokemon-name">{p.name}</span>
             </div>
@@ -65,9 +64,7 @@ function App() {
         </div>
       </section>
       <section className="controls">
-        <button className="transfer-btn"onClick={addToPokedex} disabled={selectedId === null}title="Capturar Pokémon">
-          ➔
-        </button>
+        <button className="transfer-btn"onClick={addToPokedex} disabled={selectedId === null}title="Capturar Pokémon"></button>
       </section>
       <section className="panel pokedex-panel">
         <header className="panel-header">
@@ -78,12 +75,7 @@ function App() {
         <div className="grid-container">
           {pokedex.map((p) => (
             <div key={p.id} className="card">
-              <div 
-                className="close-btn" 
-                onClick={() => returnToLibrary(p)}
-                title="Liberar Pokémon"
-              >✕</div>
-              
+              <div className="close-btn" onClick={() => returnToLibrary(p)}title="Liberar Pokémon">✕</div>
               <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`} alt={p.name} />
               <span className="pokemon-name">{p.name}</span>
             </div>
